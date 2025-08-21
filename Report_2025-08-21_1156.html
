@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veranstaltungen als Tabelle (7)</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#0f1730; --muted:#aab2d5; --text:#e8ecff; --accent:#5aa2ff;
+    --line:#1d2748; --thead:#121e3c; --zebra:#0e1630; --ok:#46c28b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:var(--bg); color:var(--text)}
+  header{padding:28px 20px; border-bottom:1px solid var(--line); background:linear-gradient(180deg, rgba(90,162,255,.12), transparent 30%)}
+  .wrap{max-width:1200px; margin:0 auto; padding:0 20px}
+  h1{margin:0 0 6px; font-size:clamp(22px,3vw,30px)}
+  .meta{color:var(--muted); font-size:13px}
+
+  .table-wrap{padding:20px 0 36px; overflow:auto}
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden}
+  thead th{position:sticky; top:0; background:var(--thead); text-align:left; font-weight:600; font-size:14px; color:#dfe6ff; border-bottom:1px solid var(--line); padding:10px 12px; white-space:nowrap}
+  tbody td{border-bottom:1px solid var(--line); vertical-align:top; padding:10px 12px}
+  tbody tr:nth-child(odd){background:var(--zebra)}
+  tbody tr:hover{outline:1px solid var(--accent); outline-offset:-1px}
+  td.id{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; color:#b8c2ff}
+  td.titel{font-weight:600}
+  td.krit span{display:inline-block; padding:2px 8px; font-size:12px; border:1px solid var(--line); border-radius:999px; color:var(--muted)}
+  td.krit span.ok{color:var(--ok); border-color:#2f6a54}
+  td.text p{margin:0 0 8px}
+  td.text ul{margin:0 0 8px 18px}
+  td.kat{color:var(--muted); font-size:13px}
+  footer{color:var(--muted); font-size:12px; padding:20px; border-top:1px solid var(--line)}
+  .small{font-size:12px; color:var(--muted)}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Veranstaltungen (Tabellenansicht)</h1>
+      <div class="meta">7 Einträge · erstellt am 21.8.2025, 09:56:43</div>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:110px">ID</th>
+            <th style="width:260px">Titel</th>
+            <th>Text</th>
+            <th style="width:160px">Kritische Inhalte</th>
+            <th style="width:260px">Begründung</th>
+            <th style="width:180px">Kategorien</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="id">req-1</td>
+              <td class="titel">Klassifizierung: kein zu prüfender Inhalt</td>
+              <td class="text"></td>
+              <td class="krit">
+                <span class="ok">nein</span>
+              </td>
+              <td class="begr"><div class="small">Es wurde kein inhaltlicher Text zur Prüfung bereitgestellt; nur eine Klassifizierungsanweisung. Daher unklar/kein_inhalt.</div></td>
+              <td class="kat">unklar/kein_inhalt</td>
+            </tr>
+          
+            <tr>
+              <td class="id">101102652</td>
+              <td class="titel">Heimat in Farben: Ein partizipatives Kunstwerk</td>
+              <td class="text"><p>Die Gemeinde Niederwiesa ist Teil des Skulpturenpfades Purple Path. Unser farbenfrohes Mitmachprojekt ist inspiriert von dem Kunstwerk „My Floating Home“ von Karolin Schwab.<br>Jeder kann auf einem Stoffquadrat von 20x20 cm symbolisch malen, was für ihn das Gefühl von ZUHAUSE ausmacht. Ist zuhause immer ein Haus? Oder ist zuhause auch dort, wo wir uns mit Menschen verbinden? Wo Blumen wachsen und Bäume? Insekten fliegen und Vögel singen? Wo Bücher gelesen werden wollen oder wo man Ball spielen kann?</p></td>
+              <td class="krit">
+                <span class="ok">nein</span>
+              </td>
+              <td class="begr"><div class="small">Der Text beschreibt ein harmloses, gemeinschaftliches Kunst-Mitmachprojekt ohne politische, anstößige, diskriminierende, gefährliche oder irreführende Inhalte. Keine sensiblen personenbezogenen Daten oder jugendgefährdenden Elemente enthalten.</div></td>
+              <td class="kat">—</td>
+            </tr>
+          
+            <tr>
+              <td class="id">101102650</td>
+              <td class="titel">Offene Textilwerkstatt: Gemeinsam reparieren und kreativ gestalten!</td>
+              <td class="text"><p>An jedem zweiten und vierten Montag im Monat laden Ina und Annika in die offene Werkstatt ein und unterstützen nach Kräften bei offenen Fragen und spezifischen Projekten. Ob das Loch in der Socke gestopft, die geliebte Jeans repariert oder ein neues Nähprojekt gestartet werden soll – hier findet jede*r den passenden Raum und die nötige Unterstützung.</p>
+<p>Die Textilwerkstatt ist voll ausgestattet und bietet eine ideale Umgebung, um alte Textilien aufzuwerten oder neue Ideen umzusetzen. Alle Teilnehmenden unterstützen sich gegenseitig und profitieren von den Tipps und Tricks der Gruppe sowie der Expertise von Ina und Annika.</p>
+<p>Die Teilnahme ist kostenfrei. Weitere Informationen gibt es auf der Website:</p>
+<p>www.aufweiterflur.org/textilwerkstatt<br>.</p></td>
+              <td class="krit">
+                <span class="ok">nein</span>
+              </td>
+              <td class="begr"><div class="small">Unbedenklicher Veranstaltungs- und Informationstext ohne politische, anstößige, gefährliche, sensible oder irreführende Inhalte; der Link ist eine normale Informationsquelle.</div></td>
+              <td class="kat">—</td>
+            </tr>
+          
+            <tr>
+              <td class="id">101102649</td>
+              <td class="titel">Techniksprechstunde für Senior*innen</td>
+              <td class="text"><p>Haben Sie Fragen zu Ihrem Smartphone, Tablet oder dem Internet? Christiane Scherch hilft im Rahmen der Techniksprechstunde gerne weiter! Ihr Ziel ist es, älteren Menschen die digitale Welt näherzubringen und sie im Alltag zu unterstützen. Durch den sicheren Umgang mit moderner Technik können Sie aktiv am gesellschaftlichen Leben teilnehmen und Einsamkeit und Isolation vorbeugen.</p>
+<p>Seit Jahresbeginn gibt es ein mal pro Monat eine 90-minütige Sprechstunde im Lehngericht für Senior*innen mit individueller Beratung zu Smartphones, Tablets und digitalen Themen.</p>
+<p>Anmeldungen und Rückfragen gerne bei Nadine unter Telefon 017621611317. Die Teilnahme ist kostenfrei.</p></td>
+              <td class="krit">
+                <span class="ok">nein</span>
+              </td>
+              <td class="begr"><div class="small">Neutrale Veranstaltungsankündigung ohne problematische Inhalte; die angegebene Telefonnummer dient erkennbar als öffentlicher Kontakt für Anmeldungen.</div></td>
+              <td class="kat">—</td>
+            </tr>
+          
+            <tr>
+              <td class="id">101100760</td>
+              <td class="titel">Festliches Adventskonzert mit Harmonic Brass</td>
+              <td class="text"><p>Ein festlicher Abend erwartet die Besucher beim Adventskonzert mit HARMONIC BRASS. Das renommierte Blechbläserensemble entführt in eine musikalische Weihnachtswelt voller Emotionen, festlicher Energie und wohltuender Momente.<br>Mit Werken von J.S. Bach und Georg Friedrich Händel, internationalen Adventsmelodien, bekannten Weihnachtsfilmklassikern und berührenden Geschichten bietet das Konzert ein bewegendes Musikerlebnis, das mitten ins Herz trifft.<br>Einlass ist ab 17 Uhr. Tickets können per E-Mail oder telefonisch unter 037342-149390 reserviert werden. Der Eintritt kostet 25 Euro (ermäßigt 21 Euro für Schüler und Studierende ab 12 Jahren), Kinder bis 12 Jahre haben freien Eintritt. Für das leibliche Wohl sorgt die Leffelstub mit winterlichen Spezialitäten.<br>Die HUSS Maschinenbau GmbH veranstaltet das Konzert auf dem eigenen Firmengelände und schafft mit stimmungsvoller Atmosphäre den passenden Rahmen für diesen besonderen musikalischen Abend in der Vorweihnachtszeit.</p></td>
+              <td class="krit">
+                <span class="ok">nein</span>
+              </td>
+              <td class="begr"><div class="small">Sachliche Veranstaltungsankündigung ohne beleidigende, politische, gefährliche oder irreführende Inhalte; die Telefonnummer ist erkennbar ein öffentlicher Ticketkontakt, keine privaten sensiblen Daten.</div></td>
+              <td class="kat">—</td>
+            </tr>
+          
+            <tr>
+              <td class="id">101100761</td>
+              <td class="titel">Herbstfest auf dem Dreiseitenhof „Zum Weihrichkarzl“</td>
+              <td class="text"><p>Zum Herbstfest öffnet der Dreiseitenhof der Schauwerkstatt „Zum Weihrichkarzl“ seine Tore. Neben Köstlichkeiten vom Grill und aus der Gulaschkanone erwartet die Besucher erneut ein vielfältiger Handwerkermarkt. Mit dabei sind unter anderem (Änderungen vorbehalten):<br><ul><li>Imkerei Thomas Haase</li><li>Korbmacher Klaus Hecker</li><li>Töpferei Heike Franke</li><li>Handschuhmacher Rico Wappler</li><li>Häkelprodukte von Häkelidoo</li><li>Schmuck und mehr von Kleines Hölzchen</li><li>Fleischerhandwerk Drechsler</li><li>Feinsattlerei Ulrich Czerny</li><li>Ätherische Öle von Lavendel Charlotte</li><li>Filzhandwerk von Monika Melzer</li><li>Herrnhuter Sterne</li><li>Kräuter, Tee &amp; Gewürze</li><li>Genähtes von Limalu</li></ul><br>Ein besonderes Highlight: Die Mobile Mosterei aus Mildenau ist wieder vor Ort. Eigenes Obst kann direkt mitgebracht und frisch zu Saft verarbeitet werden. Eine Terminreservierung wird empfohlen (0157-71774663).<br>Auch nahezu ausgestorbenes Handwerk wird auf dem Fest lebendig:<br><ul><li>Spinnrad</li><li>Fleischveredlung mittels Rauch</li><li>Bäckerhandwerk am Holzbackofen</li><li>Holzbearbeitung „wie früher“</li><li>Schmied</li><li>Klöppeln</li><li>Blechdrückerei</li></ul><br>Zusätzlich besteht die Möglichkeit, Weihrichkarzle selbst herzustellen – ganz ohne Voranmeldung. Kreativangebote wie Basteln für Kinder oder ein kostenloses Karzl-Tattoo laden zum Mitmachen ein. Abgerundet wird das Angebot durch den „Zweite-Wahl-Verkauf“ und alles rund ums Karzl.</p></td>
+              <td class="krit">
+                <span class="ok">nein</span>
+              </td>
+              <td class="begr"><div class="small">Unbedenkliche Veranstaltungsankündigung ohne politische, beleidigende oder gefährliche Inhalte; die Telefonnummer ist klar als öffentliche Kontaktangabe zur Terminreservierung ausgewiesen.</div></td>
+              <td class="kat">—</td>
+            </tr>
+          
+            <tr>
+              <td class="id">101100692</td>
+              <td class="titel">148. Galeriekonzert im StadtMuseum Pirna: twentytwo-ensemble – Echo des Sommers</td>
+              <td class="text"><p>Aufgewachsen und musikalisch geprägt im Dresdner Kreuzchor gastieren die zehn Sänger des Ensembles zum zweiten Mal im StadtMuseum Pirna. Auch in ihrem neuen Programm bringen sie dabei klassisch-geistliche Werke gemeinsam mit modernen Songs und humorvollen Stücken ihres a-cappella-Repertoires auf die Bühne. Mit »Echo des Sommers« erinnern sie in der dunklen Jahreszeit an die letzten warmen Tage des Jahres und geben gleichzeitig einen Ausblick auf einen Sommer im neuen Jahr.</p></td>
+              <td class="krit">
+                <span class="ok">nein</span>
+              </td>
+              <td class="begr"><div class="small">Unbedenklicher Veranstaltungstext über ein A-cappella-Konzert; keine politischen, anstößigen, gefährlichen oder sensiblen Inhalte, keine personenbezogenen Daten.</div></td>
+              <td class="kat">—</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </main>
+  <footer class="wrap">Generated by n8n · 2025-08-21T09:56:43.313Z</footer>
+</body>
+</html>
