@@ -1,122 +1,274 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Veranstaltungen (6)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Projekt-Index · GitHub Verteilseite</title>
+<meta name="description" content="Übersichtsseite für GitHub-Repositories mit Suche, Filter und Sortierung." />
 <style>
   :root{
-    --bg:#0b1020; --card:#121a33; --muted:#aab2d5; --text:#e8ecff; --accent:#5aa2ff; --ok:#46c28b; --warn:#ffb74d;
+    --bg:#0b1020; --panel:#101936; --text:#e9edff; --muted:#aab2d5;
+    --line:#1d2748; --accent:#5aa2ff; --card:#0f1834; --ok:#46c28b;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box} html,body{height:100%}
   body{margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:var(--bg); color:var(--text)}
-  header{padding:32px 20px; border-bottom:1px solid #1d2748; background:linear-gradient(180deg, rgba(90,162,255,.12), transparent 30%)}
-  .wrap{max-width:1000px; margin:0 auto; padding:0 20px}
-  h1{margin:0 0 8px; font-size:clamp(24px,3.5vw,36px)}
+  header{padding:28px 20px; border-bottom:1px solid var(--line); background:linear-gradient(180deg, rgba(90,162,255,.12), transparent 30%)}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 20px}
+  h1{margin:0 6px 6px 0; font-size:clamp(22px,3.5vw,34px)}
   .meta{color:var(--muted); font-size:14px}
-  .grid{display:grid; gap:18px; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); padding:24px 0 48px}
-  article{background:var(--card); border:1px solid #1d2748; border-radius:14px; padding:16px; box-shadow:0 6px 24px rgba(0,0,0,.25)}
-  article h2{margin:0 0 8px; font-size:18px}
-  article .badge{display:inline-block; font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid #2a396b; color:var(--muted)}
-  article .badge.ok{border-color:#2f6a54; color:var(--ok)}
-  article .content{margin-top:10px}
-  article p{margin:0 0 10px}
-  ul{margin:0 0 10px 18px}
-  footer{color:var(--muted); font-size:13px; padding:24px 20px; border-top:1px solid #1d2748}
-  .id{color:#7e8ac7; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px}
-  details{margin-top:8px}
-  summary{cursor:pointer}
+  .toolbar{display:grid; grid-template-columns:1fr auto auto; gap:10px; margin-top:16px}
+  .toolbar input,.toolbar select{
+    background:var(--panel); color:var(--text); border:1px solid var(--line);
+    padding:10px 12px; border-radius:10px; font-size:14px
+  }
+  .section{padding:22px 0}
+  h2{font-size:18px; margin:0 0 10px; color:#dfe6ff}
+  .grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px;
+    box-shadow:0 6px 22px rgba(0,0,0,.25); display:flex; flex-direction:column; min-height:160px
+  }
+  .card h3{margin:0 0 8px; font-size:16px}
+  .card p{margin:0 0 10px; color:var(--muted); font-size:14px}
+  .tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:auto}
+  .tag{font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:3px 8px}
+  .row{display:flex; gap:10px; align-items:center; color:var(--muted); font-size:13px; margin:8px 0 0}
+  .row b{color:#cbd6ff; font-weight:600}
+  .links{display:flex; gap:10px; margin-top:10px}
+  .btn{display:inline-block; padding:8px 10px; border-radius:10px; text-decoration:none; color:var(--text); border:1px solid var(--line); background:transparent}
+  .btn:hover{border-color:var(--accent)}
+  .empty{color:var(--muted); border:1px dashed var(--line); padding:16px; border-radius:12px}
+  footer{color:var(--muted); font-size:12px; padding:24px 20px; border-top:1px solid var(--line)}
+  .pill{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); font-size:12px; color:var(--muted)}
+  .pill.ok{color:var(--ok); border-color:#2f6a54}
+  @media (max-width:720px){ .toolbar{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <h1>Veranstaltungen</h1>
-      <div class="meta">6 Einträge · erstellt am 21.8.2025, 08:11:48</div>
+<header>
+  <div class="wrap">
+    <h1>Projekt-Index</h1>
+    <div class="meta" id="meta">lädt…</div>
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="Suche in Namen & Beschreibung … (z. B. „quali“)" />
+      <select id="sort">
+        <option value="updated">Sortierung: Zuletzt aktualisiert</option>
+        <option value="pushed">Sortierung: Zuletzt gepusht</option>
+        <option value="created">Sortierung: Neuste zuerst</option>
+        <option value="name">Sortierung: Name A–Z</option>
+        <option value="stars">Sortierung: Sterne ↓</option>
+      </select>
+      <select id="visibility">
+        <option value="all">Alle Repos</option>
+        <option value="public">Nur Public</option>
+        <option value="private">Nur Private*</option>
+      </select>
     </div>
-  </header>
-  <main class="wrap">
-    <section class="grid">
-      
-        <article>
-          <span class="id">ID: 101102652</span>
-          <h2>Heimat in Farben: Ein partizipatives Kunstwerk</h2>
-          <span class="badge ok">
-            kritische Inhalte: nein
-          </span>
-          <div class="content">
-            <p>Die Gemeinde Niederwiesa ist Teil des Skulpturenpfades Purple Path. Unser farbenfrohes Mitmachprojekt ist inspiriert von dem Kunstwerk „My Floating Home“ von Karolin Schwab.  <br>Jeder kann auf einem Stoffquadrat von 20x20 cm symbolisch malen, was für ihn das Gefühl von ZUHAUSE ausmacht.  Ist zuhause immer ein Haus? Oder ist zuhause auch dort, wo wir uns mit Menschen verbinden? Wo Blumen wachsen und Bäume? Insekten fliegen und Vögel singen? Wo Bücher gelesen werden wollen oder wo man Ball spielen kann?</p>
-          </div>
-          <details><summary class="badge">Begründung</summary><div style="margin-top:8px">Unproblematischer Einladungstext zu einem Mitmach-Kunstprojekt; keine politischen, anstößigen, diskriminierenden, gefährlichen oder sensiblen Inhalte erkennbar.</div></details>
-        </article>
-      
-        <article>
-          <span class="id">ID: 101102650</span>
-          <h2>Offene Textilwerkstatt: Gemeinsam reparieren und kreativ gestalten!</h2>
-          <span class="badge ok">
-            kritische Inhalte: nein
-          </span>
-          <div class="content">
-            <p>An jedem zweiten und vierten Montag im Monat laden Ina und Annika in die offene Werkstatt ein und unterstützen nach Kräften bei offenen Fragen und spezifischen Projekten. Ob das Loch in der Socke gestopft, die geliebte Jeans repariert oder ein neues Nähprojekt gestartet werden soll – hier findet jede*r den passenden Raum und die nötige Unterstützung.</p>
-<p>Die Textilwerkstatt ist voll ausgestattet und bietet eine ideale Umgebung, um alte Textilien aufzuwerten oder neue Ideen umzusetzen. Alle Teilnehmenden unterstützen sich gegenseitig und profitieren von den Tipps und Tricks der Gruppe sowie der Expertise von Ina und Annika.</p>
-<p>Die Teilnahme ist kostenfrei. Weitere Informationen gibt es auf der Website:</p>
-<p>www.aufweiterflur.org/textilwerkstatt<br>.</p>
-          </div>
-          <details><summary class="badge">Begründung</summary><div style="margin-top:8px">Neutrale Veranstaltungsankündigung ohne problematische Aussagen; kein beleidigender, politischer oder gefährlicher Inhalt; keine sensiblen personenbezogenen Daten; regulärer Website-Link.</div></details>
-        </article>
-      
-        <article>
-          <span class="id">ID: 101102649</span>
-          <h2>Techniksprechstunde für Senior*innen</h2>
-          <span class="badge ok">
-            kritische Inhalte: nein
-          </span>
-          <div class="content">
-            <p>Haben Sie Fragen zu Ihrem Smartphone, Tablet oder dem Internet? Christiane Scherch hilft im Rahmen der Techniksprechstunde gerne weiter! Ihr Ziel ist es, älteren Menschen die digitale Welt näherzubringen und sie im Alltag zu unterstützen. Durch den sicheren Umgang mit moderner Technik können Sie aktiv am gesellschaftlichen Leben teilnehmen und Einsamkeit und Isolation vorbeugen.</p>
-<p>Seit Jahresbeginn gibt es ein mal pro Monat eine 90-minütige Sprechstunde im Lehngericht für Senior*innen mit individueller Beratung zu Smartphones, Tablets und digitalen Themen.</p>
-<p>Anmeldungen und Rückfragen gerne bei Nadine unter Telefon 017621611317. Die Teilnahme ist kostenfrei.</p>
-          </div>
-          <details><summary class="badge">Begründung</summary><div style="margin-top:8px">Unbedenkliche Veranstaltungsankündigung ohne politische, anstößige oder gefährliche Inhalte; die Telefonnummer ist erkennbar eine öffentliche Kontaktangabe für die Anmeldung und daher nicht als sensible private Daten zu werten.</div></details>
-        </article>
-      
-        <article>
-          <span class="id">ID: 101100760</span>
-          <h2>Festliches Adventskonzert mit Harmonic Brass</h2>
-          <span class="badge ok">
-            kritische Inhalte: nein
-          </span>
-          <div class="content">
-            <p>Ein festlicher Abend erwartet die Besucher beim Adventskonzert mit HARMONIC BRASS. Das renommierte Blechbläserensemble entführt in eine musikalische Weihnachtswelt voller Emotionen, festlicher Energie und wohltuender Momente.<br>Mit Werken von J.S. Bach und Georg Friedrich Händel, internationalen Adventsmelodien, bekannten Weihnachtsfilmklassikern und berührenden Geschichten bietet das Konzert ein bewegendes Musikerlebnis, das mitten ins Herz trifft.<br>Einlass ist ab 17 Uhr. Tickets können per E-Mail oder telefonisch unter 037342-149390 reserviert werden. Der Eintritt kostet 25 Euro (ermäßigt 21 Euro für Schüler und Studierende ab 12 Jahren), Kinder bis 12 Jahre haben freien Eintritt. Für das leibliche Wohl sorgt die Leffelstub mit winterlichen Spezialitäten.<br>Die HUSS Maschinenbau GmbH veranstaltet das Konzert auf dem eigenen Firmengelände und schafft mit stimmungsvoller Atmosphäre den passenden Rahmen für diesen besonderen musikalischen Abend in der Vorweihnachtszeit.</p>
-          </div>
-          <details><summary class="badge">Begründung</summary><div style="margin-top:8px">Unauffällige Veranstaltungsankündigung ohne beleidigende, politische, gefährliche oder jugendschutzrelevante Inhalte. Enthaltene Kontaktdaten (Telefon) sind klar als öffentliche Veranstaltungs- bzw. Firmenkontakte erkennbar, daher keine sensiblen Daten.</div></details>
-        </article>
-      
-        <article>
-          <span class="id">ID: 101100761</span>
-          <h2>Herbstfest auf dem Dreiseitenhof „Zum Weihrichkarzl“</h2>
-          <span class="badge ok">
-            kritische Inhalte: nein
-          </span>
-          <div class="content">
-            <p>Zum Herbstfest öffnet der Dreiseitenhof der Schauwerkstatt „Zum Weihrichkarzl“ seine Tore. Neben Köstlichkeiten vom Grill und aus der Gulaschkanone erwartet die Besucher erneut ein vielfältiger Handwerkermarkt. Mit dabei sind unter anderem (Änderungen vorbehalten):<br><ul><li>Imkerei Thomas Haase</li><li>Korbmacher Klaus Hecker</li><li>Töpferei Heike Franke</li><li>Handschuhmacher Rico Wappler</li><li>Häkelprodukte von Häkelidoo</li><li>Schmuck und mehr von Kleines Hölzchen</li><li>Fleischerhandwerk Drechsler</li><li>Feinsattlerei Ulrich Czerny</li><li>Ätherische Öle von Lavendel Charlotte</li><li>Filzhandwerk von Monika Melzer</li><li>Herrnhuter Sterne</li><li>Kräuter, Tee &amp; Gewürze</li><li>Genähtes von Limalu</li></ul><br>Ein besonderes Highlight: Die Mobile Mosterei aus Mildenau ist wieder vor Ort. Eigenes Obst kann direkt mitgebracht und frisch zu Saft verarbeitet werden. Eine Terminreservierung wird empfohlen (0157-71774663).<br>Auch nahezu ausgestorbenes Handwerk wird auf dem Fest lebendig:<br><ul><li>Spinnrad</li><li>Fleischveredlung mittels Rauch</li><li>Bäckerhandwerk am Holzbackofen</li><li>Holzbearbeitung „wie früher“</li><li>Schmied</li><li>Klöppeln</li><li>Blechdrückerei</li></ul><br>Zusätzlich besteht die Möglichkeit, Weihrichkarzle selbst herzustellen – ganz ohne Voranmeldung. Kreativangebote wie Basteln für Kinder oder ein kostenloses Karzl-Tattoo laden zum Mitmachen ein. Abgerundet wird das Angebot durch den „Zweite-Wahl-Verkauf“ und alles rund ums Karzl.</p>
-          </div>
-          <details><summary class="badge">Begründung</summary><div style="margin-top:8px">Unauffällige Veranstaltungsankündigung ohne problematische Inhalte; die Telefonnummer dient erkennbar der Terminvergabe (öffentlicher Kontakt), keine sensiblen privaten Daten.</div></details>
-        </article>
-      
-        <article>
-          <span class="id">ID: 101100692</span>
-          <h2>148. Galeriekonzert im StadtMuseum Pirna: twentytwo-ensemble – Echo des Sommers</h2>
-          <span class="badge ok">
-            kritische Inhalte: nein
-          </span>
-          <div class="content">
-            <p>Aufgewachsen und musikalisch geprägt im Dresdner Kreuzchor gastieren die zehn Sänger des Ensembles zum zweiten Mal im StadtMuseum Pirna. Auch in ihrem neuen Programm bringen sie dabei klassisch-geistliche Werke gemeinsam mit modernen Songs und humorvollen Stücken ihres a-cappella-Repertoires auf die Bühne. Mit »Echo des Sommers« erinnern sie in der dunklen Jahreszeit an die letzten warmen Tage des Jahres und geben gleichzeitig einen Ausblick auf einen Sommer im neuen Jahr.</p>
-          </div>
-          <details><summary class="badge">Begründung</summary><div style="margin-top:8px">Neutrale Veranstaltungsankündigung ohne beleidigende, politische, gefährliche oder sensible Inhalte; es werden lediglich Musikprogramm und Stimmung beschrieben (z. B. „klassisch-geistliche Werke“, „humorvolle Stücke“).</div></details>
-        </article>
-      
-    </section>
-  </main>
-  <footer class="wrap">Generated by n8n · 2025-08-21T08:11:48.902Z</footer>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section" id="featuredSec" style="display:none">
+    <h2>Empfohlen (<span id="featuredCount">0</span>)</h2>
+    <div class="grid" id="featured"></div>
+  </section>
+
+  <section class="section">
+    <h2>Alle Repositories (<span id="count">0</span>)</h2>
+    <div class="grid" id="list"></div>
+    <div id="empty" class="empty" style="display:none">Keine Repositories gefunden. Passe Suche/Filter an.</div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>Generiert client-seitig via GitHub API · Kein Build nötig · <span id="updated"></span></span>
+</footer>
+
+<script>
+/** ======== KONFIGURATION ======== */
+const CONFIG = {
+  // 👇 HIER EINTRAGEN: GitHub User ODER Organisation
+  owner: "YOUR_GITHUB_OWNER",    // z.B. "TMGSachsen" oder "deinUser"
+  // Repos mit diesem Präfix werden im „Empfohlen“-Block hervorgehoben
+  featuredPrefix: "quali",        // z.B. "quali", "satourn", "" zum Deaktivieren
+  // Optional: nur Repos anzeigen, die mit diesen Präfixen anfangen (leer = alle)
+  allowedPrefixes: [],            // z.B. ["quali", "satourn"]
+  // Optional: Themen/Topics anzeigen? (benötigt public Topics)
+  showTopics: true
+};
+/** ================================= */
+
+const els = {
+  meta: document.getElementById('meta'),
+  list: document.getElementById('list'),
+  featured: document.getElementById('featured'),
+  featuredSec: document.getElementById('featuredSec'),
+  count: document.getElementById('count'),
+  featuredCount: document.getElementById('featuredCount'),
+  empty: document.getElementById('empty'),
+  updated: document.getElementById('updated'),
+  q: document.getElementById('q'),
+  sort: document.getElementById('sort'),
+  visibility: document.getElementById('visibility')
+};
+
+const state = {
+  all: [],
+  filtered: [],
+  featured: []
+};
+
+function fmtDate(s){ try{ return new Date(s).toLocaleString('de-DE'); }catch{ return s; } }
+function esc(s=''){ return String(s).replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])); }
+function matchesPrefixes(name, prefixes){
+  if (!prefixes || !prefixes.length) return true;
+  return prefixes.some(p => name.toLowerCase().startsWith(p.toLowerCase()));
+}
+function isFeatured(name, prefix){
+  if (!prefix) return false;
+  return name.toLowerCase().startsWith(prefix.toLowerCase());
+}
+
+function card(repo){
+  const name = repo.name;
+  const desc = repo.description || '';
+  const topics = Array.isArray(repo.topics) ? repo.topics.slice(0,6) : [];
+  return `
+  <article class="card">
+    <h3>${esc(name)}</h3>
+    <p>${esc(desc)}</p>
+    <div class="row">
+      <span class="pill">★ ${repo.stargazers_count}</span>
+      <span class="pill">Forks ${repo.forks_count}</span>
+      <span class="pill">Sprache ${esc(repo.language || '—')}</span>
+    </div>
+    <div class="row">Zuletzt aktualisiert: <b>${fmtDate(repo.updated_at)}</b></div>
+    <div class="links">
+      <a class="btn" href="${repo.html_url}" target="_blank" rel="noopener">Repo öffnen</a>
+      ${repo.homepage ? `<a class="btn" href="${repo.homepage}" target="_blank" rel="noopener">Demo/Seite</a>` : ''}
+      <a class="btn" href="${repo.html_url}/releases" target="_blank" rel="noopener">Releases</a>
+    </div>
+    ${CONFIG.showTopics && topics.length ? `<div class="tags">${topics.map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div>`:''}
+  </article>`;
+}
+
+function applyFilters(){
+  const q = els.q.value.trim().toLowerCase();
+  const vis = els.visibility.value; // "all"|"public"|"private"
+  let arr = state.all.slice();
+
+  if (vis !== 'all') {
+    arr = arr.filter(r => (vis === 'public') ? !r.private : r.private);
+  }
+  if (CONFIG.allowedPrefixes && CONFIG.allowedPrefixes.length) {
+    arr = arr.filter(r => matchesPrefixes(r.name, CONFIG.allowedPrefixes));
+  }
+  if (q) {
+    arr = arr.filter(r =>
+      (r.name && r.name.toLowerCase().includes(q)) ||
+      (r.description && r.description.toLowerCase().includes(q))
+    );
+  }
+
+  // Sort
+  const s = els.sort.value;
+  arr.sort((a,b)=>{
+    if (s === 'name') return a.name.localeCompare(b.name, 'de');
+    if (s === 'stars') return (b.stargazers_count|0) - (a.stargazers_count|0);
+    if (s === 'pushed') return new Date(b.pushed_at) - new Date(a.pushed_at);
+    if (s === 'created') return new Date(b.created_at) - new Date(a.created_at);
+    // default: updated
+    return new Date(b.updated_at) - new Date(a.updated_at);
+  });
+
+  // Featured
+  const feat = CONFIG.featuredPrefix ? arr.filter(r => isFeatured(r.name, CONFIG.featuredPrefix)) : [];
+  const rest = CONFIG.featuredPrefix ? arr.filter(r => !isFeatured(r.name, CONFIG.featuredPrefix)) : arr;
+
+  state.filtered = rest;
+  state.featured = feat;
+
+  render();
+}
+
+function render(){
+  els.count.textContent = state.filtered.length;
+  els.featuredCount.textContent = state.featured.length;
+  els.featuredSec.style.display = state.featured.length ? '' : 'none';
+
+  els.featured.innerHTML = state.featured.map(card).join('');
+  els.list.innerHTML = state.filtered.map(card).join('');
+  els.empty.style.display = (state.filtered.length + state.featured.length) ? 'none' : '';
+}
+
+async function fetchAllRepos(owner){
+  // List repos for user/org – wir probieren beide Endpunkte.
+  const headers = {'Accept': 'application/vnd.github+json'};
+  const perPage = 100;
+  let repos = [];
+
+  // helper: paginierte Abfrage
+  async function fetchPaged(url){
+    let page = 1, out = [];
+    while (true){
+      const res = await fetch(`${url}?per_page=${perPage}&page=${page}`, {headers});
+      if (res.status === 404) return []; // falscher Typ (user vs org)
+      if (!res.ok) throw new Error('GitHub API Fehler: '+res.status);
+      const data = await res.json();
+      out = out.concat(data);
+      if (data.length < perPage) break;
+      page++;
+    }
+    return out;
+  }
+
+  // Versuche Organisation
+  repos = await fetchPaged(`https://api.github.com/orgs/${encodeURIComponent(owner)}/repos`);
+  if (!repos.length){
+    // Versuche Nutzer
+    repos = await fetchPaged(`https://api.github.com/users/${encodeURIComponent(owner)}/repos`);
+  }
+
+  // Topics extra (benötigt pro Repo call)
+  if (CONFIG.showTopics && repos.length){
+    await Promise.all(repos.map(async r=>{
+      try{
+        const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(r.owner.login)}/${encodeURIComponent(r.name)}/topics`, {
+          headers: {'Accept':'application/vnd.github.mercy-preview+json'}
+        });
+        if (res.ok){ const t = await res.json(); r.topics = t.names || []; }
+      }catch(e){}
+    }));
+  }
+  return repos;
+}
+
+function readOwnerFromURL(){
+  const u = new URL(location.href);
+  const ownerQ = u.searchParams.get('owner');
+  return ownerQ || CONFIG.owner;
+}
+
+(async function init(){
+  const owner = readOwnerFromURL();
+  els.meta.textContent = `Quelle: github.com/${owner} · (anonymes API-Limit: ~60 Requests/Stunde)`;
+  els.updated.textContent = new Date().toLocaleString('de-DE');
+
+  try{
+    const repos = await fetchAllRepos(owner);
+    state.all = repos;
+    applyFilters();
+  }catch(e){
+    els.list.innerHTML = `<div class="empty">Fehler beim Laden der Repos: ${esc(e.message)}<br>
+    Prüfe den Owner-Namen oder versuche es später erneut.</div>`;
+  }
+
+  ['input','change'].forEach(ev=>{
+    els.q.addEventListener(ev, applyFilters);
+    els.sort.addEventListener(ev, applyFilters);
+    els.visibility.addEventListener(ev, applyFilters);
+  });
+})();
+</script>
 </body>
 </html>
