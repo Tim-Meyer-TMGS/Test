@@ -1,79 +1,33 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Verteilseite</title>
-<meta name="description" content="Automatisch generierte Übersicht aller HTML-Dateien im Repo-Hauptordner.">
-<style>
-  :root{--bg:#0b1020; --panel:#101936; --text:#e9edff; --muted:#aab2d5; --line:#1d2748; --accent:#5aa2ff;}
-  *{box-sizing:border-box}
-  body{margin:0; padding:2rem; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:var(--bg); color:var(--text)}
-  h1{margin:0 0 4px}
-  .meta{color:var(--muted); margin:0 0 16px; font-size:14px}
-  ul{list-style:none; padding:0; margin:0}
-  li{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px}
-  a{color:#dfe6ff; text-decoration:none}
-  a:hover{color:var(--accent); text-decoration:underline}
-  .empty{color:var(--muted); border:1px dashed var(--line); border-radius:10px; padding:16px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Verteilseite</title>
+  <style>
+    :root{ --bg:#0b1020; --panel:#101936; --text:#e9edff; --muted:#aab2d5; --line:#1d2748; --accent:#5aa2ff; }
+    *{ box-sizing:border-box }
+    body{ margin:0; padding:2rem; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:var(--bg); color:var(--text) }
+    h1{ margin:0 0 4px }
+    p.meta{ color:var(--muted); margin:0 0 16px; font-size:14px }
+    ul{ list-style:none; padding:0; margin:0 }
+    li{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px }
+    a{ color:#dfe6ff; text-decoration:none }
+    a:hover{ color:var(--accent); text-decoration:underline }
+  </style>
 </head>
 <body>
   <h1>Verteilseite</h1>
-  <p class="meta">Alle HTML-Dateien im Repo-Hauptordner · Stand: <span id="ts">—</span></p>
+  <p class="meta">Links zu allen Reports im Repo-Hauptordner</p>
 
-  <ul id="list">
-    <!-- LIST_START -->
-    <li class="empty">Noch keine .html-Dateien gefunden.</li>
-    <!-- LIST_END -->
+  <ul>
+    <!-- Bekannte Reports (Beispiele) -->
+    <li><a href="./Report_2025-08-21_1053.html">Report 2025-08-21 10:53</a></li>
+    <li><a href="./Report_2025-08-21_1113.html">Report 2025-08-21 11:13</a></li>
+
+    <!-- Weitere Reports hier einfach ergänzen:
+    <li><a href="./Report_2025-08-21_1205.html">Report 2025-08-21 12:05</a></li>
+    -->
   </ul>
-
-  <!--
-    Eingebetteter Generator: Wird NICHT im Browser ausgeführt.
-    Die GitHub Action liest diesen Block aus, führt ihn unter Node aus und
-    überschreibt die Liste (LIST_START/END) sowie den Zeitstempel (id="ts").
-  -->
-  <script id="generator" type="application/generator+js">
-  // Liefert neue HTML-Datei als String zurück (Liste + Zeitstempel aktualisiert)
-  function generateIndex(html) {
-    const fs   = require('fs');
-    const path = require('path');
-    const dir  = process.cwd();
-
-    const isHtml  = n => /\.html?$/i.test(n);
-    const isIndex = n => /^index\.html?$/i.test(n);
-
-    // Nur Dateien IM ROOT, keine Unterordner; index.html ausschließen
-    const files = fs.readdirSync(dir, { withFileTypes: true })
-      .filter(d => d.isFile())
-      .map(d => d.name)
-      .filter(n => isHtml(n) && !isIndex(n))
-      .map(name => ({ name, mtime: fs.statSync(path.join(dir, name)).mtimeMs }))
-      .sort((a,b) => b.mtime - a.mtime); // Neueste zuerst
-
-    const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-    const items = files.length
-      ? files.map(({name}) => `<li><a href="./${encodeURIComponent(name)}">${esc(name.replace(/_/g,' '))}</a></li>`).join('\n    ')
-      : `<li class="empty">Keine .html-Dateien im Repo-Root gefunden.</li>`;
-
-    const ts = new Date().toLocaleString('de-DE');
-
-    // Bereich zwischen LIST_START/END ersetzen
-    html = html.replace(
-      /(<!-- LIST_START -->)[\s\S]*?(<!-- LIST_END -->)/,
-      `$1\n    ${items}\n    $2`
-    );
-    // Zeitstempel ersetzen
-    html = html.replace(/(<span id="ts">)[\s\S]*?(<\/span>)/, `$1${ts}$2`);
-    return html;
-  }
-  </script>
-
-  <script>
-    // Im Browser nur (optional) „Live“-Zeit anzeigen, falls nicht durch Action gesetzt
-    if (document.getElementById('ts').textContent.trim() === '—') {
-      document.getElementById('ts').textContent = new Date().toLocaleString('de-DE');
-    }
-  </script>
 </body>
 </html>
