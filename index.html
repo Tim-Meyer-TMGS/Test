@@ -79,16 +79,12 @@
 </footer>
 
 <script>
-/** ========= KONFIG ========= */
 const CONFIG = {
-  // Präfix für „Empfohlen“ (leer lassen, um zu deaktivieren)
   featuredPrefix: 'quali',
-  // Falls Auto-Erkennung von Owner/Repo scheitert, hier fallback setzen (oder via URL-Params owner/repo/ref übergeben)
-  fallbackOwner: '',
-  fallbackRepo: '',
-  fallbackRef: '' // z.B. 'gh-pages' oder 'main'
+  fallbackOwner: '',  // optional eintragen
+  fallbackRepo: '',   // optional eintragen
+  fallbackRef: ''     // optional: z. B. 'gh-pages'
 };
-/** ========================== */
 
 const els = {
   meta: document.getElementById('meta'),
@@ -104,134 +100,149 @@ const els = {
   filter: document.getElementById('filter')
 };
 
-const state = {
-  files: [],
-  featured: [],
-  rest: []
-};
+const state = { files: [] };
 
 function esc(s=''){ return String(s).replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])); }
-function isHtmlName(name){ return /\.html?$/i.test(name); }
-function isIndex(name){ return /^index\.html?$/i.test(name); }
-function isFeatured(name){ return CONFIG.featuredPrefix && name.toLowerCase().startsWith(CONFIG.featuredPrefix.toLowerCase()); }
+const isHtml = n => /\.html?$/i.test(n);
+const isIndex = n => /^index\.html?$/i.test(n);
+const isFeatured = (n,p='quali') => p && n.toLowerCase().startsWith(p.toLowerCase());
 
 function detectOwnerRepoRef(){
   const u = new URL(location.href);
-  const qpOwner = u.searchParams.get('owner');
-  const qpRepo = u.searchParams.get('repo');
-  const qpRef = u.searchParams.get('ref');
-
-  let owner = qpOwner || '';
-  let repo = qpRepo || '';
-  let ref = qpRef || '';
-
-  // Auto-Erkennung für GitHub Project Pages: owner.github.io/repo/...
-  if (!owner || !repo){
-    const host = location.hostname; // z.B. tmgsachsen.github.io
-    const parts = location.pathname.split('/').filter(Boolean); // ["repo", ...]
-    if (host.endsWith('.github.io') && parts.length){
-      owner = owner || host.split('.')[0];
-      repo = repo || parts[0];
-    }
+  let owner = u.searchParams.get('owner') || '';
+  let repo  = u.searchParams.get('repo')  || '';
+  let ref   = u.searchParams.get('ref')   || '';
+  if ((!owner || !repo) && location.hostname.endsWith('.github.io')) {
+    owner = owner || location.hostname.split('.')[0];
+    const parts = location.pathname.split('/').filter(Boolean);
+    repo = repo || (parts[0] || '');
   }
-  // Fallbacks
-  owner = owner || CONFIG.fallbackOwner;
-  repo  = repo  || CONFIG.fallbackRepo;
-  ref   = ref   || CONFIG.fallbackRef;
-
-  return {owner, repo, ref};
+  owner ||= CONFIG.fallbackOwner;
+  repo  ||= CONFIG.fallbackRepo;
+  ref   ||= CONFIG.fallbackRef;
+  return { owner, repo, ref };
 }
 
 function card(file){
-  const name = file.name;
-  const url = file.browser_url; // relative Link zur Seite
   return `
     <article class="card">
-      <h3>${esc(name)}</h3>
-      <p class="muted">${esc(file.description || '')}</p>
+      <h3>${esc(file.name)}</h3>
       <div class="links">
-        <a class="btn" href="${url}" target="_self" rel="noopener">Öffnen</a>
-        <a class="btn" href="${file.html_url}" target="_blank" rel="noopener">Quelle (Repo)</a>
+        <a class="btn" href="${file.browser_url}" target="_self" rel="noopener">Öffnen</a>
+        <a class="btn" href="${file.html_url}" target="_blank" rel="noopener">Quelle</a>
       </div>
-    </article>
-  `;
+    </article>`;
 }
 
 function render(){
   const q = els.q.value.trim().toLowerCase();
-  const sort = els.sort.value;
   const filter = els.filter.value;
+  const sort = els.sort.value;
 
   let arr = state.files.slice();
-
   if (filter === 'featured') arr = arr.filter(f => f._featured);
   if (filter === 'nonfeatured') arr = arr.filter(f => !f._featured);
+  if (q) arr = arr.filter(f => f.name.toLowerCase().includes(q));
+  arr.sort((a,b)=> sort === 'nameDesc' ? b.name.localeCompare(a.name,'de') : a.name.localeCompare(b.name,'de'));
 
-  if (q) {
-    arr = arr.filter(f => f.name.toLowerCase().includes(q));
-  }
-
-  // Sortierung
-  arr.sort((a,b)=>{
-    if (sort === 'nameDesc') return b.name.localeCompare(a.name, 'de');
-    return a.name.localeCompare(b.name, 'de');
-  });
-
-  // Featured-Block
   const feat = arr.filter(f => f._featured);
   const rest = arr.filter(f => !f._featured);
 
   els.featuredCount.textContent = feat.length;
   els.featuredSec.style.display = feat.length ? '' : 'none';
   els.featuredList.innerHTML = feat.map(card).join('');
-
   els.count.textContent = arr.length;
   els.fileList.innerHTML = rest.map(card).join('');
   els.empty.style.display = arr.length ? 'none' : '';
 }
 
-async function fetchRootHtmlFiles(owner, repo, ref){
-  const headers = { 'Accept': 'application/vnd.github+json' };
+async function fetchJSON(url, headers){
+  const res = await fetch(url, { headers });
+  if (res.status === 404) throw new Error('404_NOT_FOUND');
+  if (res.status === 403) throw new Error('403_FORBIDDEN'); // rate limit oder privat
+  if (!res.ok) throw new Error(String(res.status));
+  return res.json();
+}
+
+async function getDefaultBranch(owner, repo){
+  const headers = {'Accept':'application/vnd.github+json'};
+  const data = await fetchJSON(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, headers);
+  return data.default_branch || 'main';
+}
+
+async function listRootHtml(owner, repo, ref){
+  const headers = {'Accept':'application/vnd.github+json'};
   const url = new URL(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/`);
   if (ref) url.searchParams.set('ref', ref);
-
-  const res = await fetch(url.toString(), {headers});
-  if (!res.ok) throw new Error(`GitHub API Fehler ${res.status}`);
-  const data = await res.json();
-  // Nur Dateien im Root, die .html sind (ohne index.html)
-  const files = (Array.isArray(data) ? data : [])
-    .filter(e => e.type === 'file' && isHtmlName(e.name) && !isIndex(e.name))
+  const data = await fetchJSON(url.toString(), headers);
+  return (Array.isArray(data)?data:[])
+    .filter(e => e.type === 'file' && isHtml(e.name) && !isIndex(e.name))
     .map(e => ({
       name: e.name,
       path: e.path,
-      size: e.size,
-      sha: e.sha,
       html_url: `https://github.com/${owner}/${repo}/blob/${ref || 'HEAD'}/${encodeURIComponent(e.path)}`,
-      // Browser-URL relativ (funktioniert auch mit Custom Domains):
       browser_url: `./${encodeURIComponent(e.name)}`,
-      _featured: isFeatured(e.name)
+      _featured: isFeatured(e.name, CONFIG.featuredPrefix)
     }));
-  return files;
 }
 
 (async function init(){
   els.updated.textContent = new Date().toLocaleString('de-DE');
-  const {owner, repo, ref} = detectOwnerRepoRef();
+  const {owner, repo, ref: refParam} = detectOwnerRepoRef();
 
   if (!owner || !repo){
-    els.meta.innerHTML = `⚠️ Owner/Repo nicht erkannt. Übergib sie per URL, z. B. <code>?owner=TMGSachsen&repo=mein-repo&ref=gh-pages</code> oder trage Fallbacks im Skript ein.`;
+    els.meta.innerHTML = `⚠️ Owner/Repo nicht erkannt. Übergib per URL: <code>?owner=DEINUSER&repo=DEINREPO&ref=BRANCH</code>`;
     return;
   }
 
-  els.meta.textContent = `Quelle: ${owner}/${repo}${ref ? ' @ '+ref : ''} · zeigt *.html im Repo-Root`;
-
-  try{
-    const files = await fetchRootHtmlFiles(owner, repo, ref);
-    state.files = files;
-    render();
-  }catch(e){
-    els.fileList.innerHTML = `<div class="empty">Fehler beim Laden: ${esc(e.message)}. Prüfe Branch/Ref oder Repo-Berechtigungen.</div>`;
+  // 1) Ermittel default_branch, falls kein ref übergeben
+  let refsToTry = [];
+  try {
+    const defaultRef = refParam || await getDefaultBranch(owner, repo);
+    refsToTry = [defaultRef];
+  } catch (e) {
+    if (e.message === '404_NOT_FOUND') {
+      els.fileList.innerHTML = `<div class="empty">Repo <b>${esc(owner)}/${esc(repo)}</b> nicht gefunden (oder privat).</div>`;
+      return;
+    }
+    if (e.message === '403_FORBIDDEN') {
+      els.fileList.innerHTML = `<div class="empty">Zugriff verweigert / Rate-Limit. Ist das Repo privat? Öffentliche Repos sind nötig.</div>`;
+      return;
+    }
+    els.fileList.innerHTML = `<div class="empty">Fehler: ${esc(e.message)}</div>`;
+    return;
   }
+
+  // 2) Zusätzlich gh-pages testen, falls nicht identisch
+  if (!refParam && !refsToTry.includes('gh-pages')) refsToTry.push('gh-pages');
+
+  els.meta.textContent = `Quelle: ${owner}/${repo} · prüfe Branch: ${refsToTry.join(', ')}`;
+
+  // 3) Refs der Reihe nach probieren, erster Treffer gewinnt
+  let files = [];
+  for (const r of refsToTry) {
+    try {
+      const f = await listRootHtml(owner, repo, r);
+      if (f.length) { files = f; break; }
+      // wenn leer, trotzdem weiterprobieren
+    } catch (e) {
+      if (e.message === '403_FORBIDDEN') {
+        els.fileList.innerHTML = `<div class="empty">Repo ist privat oder Rate-Limit erreicht. Öffentlich schalten oder mit Token laden.</div>`;
+        return;
+      }
+      // bei 404 weiter mit nächstem ref
+    }
+  }
+
+  if (!files.length){
+    els.fileList.innerHTML = `<div class="empty">Keine *.html im Repo-Root gefunden (ausgenommen index.html). Leigen die Dateien evtl. in Unterordnern oder auf einem anderen Branch?</div>`;
+    els.count.textContent = '0';
+    els.featuredSec.style.display = 'none';
+    return;
+  }
+
+  state.files = files;
+  render();
 
   ['input','change'].forEach(ev=>{
     els.q.addEventListener(ev, render);
@@ -240,5 +251,6 @@ async function fetchRootHtmlFiles(owner, repo, ref){
   });
 })();
 </script>
+
 </body>
 </html>
