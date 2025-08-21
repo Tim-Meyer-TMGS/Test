@@ -1,49 +1,32 @@
-name: Generate index.html
-
+# .github/workflows/pages.yml
+name: Deploy static site to Pages
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - "*.html"
-      - ".github/workflows/generate-index.yml"
   workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # erlaubt das Committen
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      # Optional: hier ggf. deine index.html-Aktualisierung laufen lassen
+      # - run: node index.html  # falls du den eingebetteten Generator nutzt
+      - name: Upload artifact (ALLE Dateien aus dem Repo-Root)
+        uses: actions/upload-pages-artifact@v3
         with:
-          fetch-depth: 0
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Regenerate index.html from embedded generator
-        run: |
-          node -e '
-          const fs = require("fs");
-          const vm = require("vm");
-          let html = fs.readFileSync("index.html","utf8");
-          const m = html.match(/<script id="generator"[^>]*>([\\s\\S]*?)<\\/script>/);
-          if (!m) throw new Error("Generator-Script nicht gefunden");
-          const ctx = { require, process, console };
-          vm.createContext(ctx);
-          vm.runInContext(m[1], ctx);
-          if (typeof ctx.generateIndex !== "function") throw new Error("generateIndex() fehlt");
-          const out = ctx.generateIndex(html);
-          fs.writeFileSync("index.html", out, "utf8");
-          console.log("index.html neu erzeugt");
-          '
-
-      - name: Commit changes (if any)
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: auto-generate index.html"
-          branch: main
-          file_pattern: index.html
+          path: ./
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
