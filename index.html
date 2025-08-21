@@ -3,65 +3,59 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Projekt-Index · GitHub Verteilseite</title>
-<meta name="description" content="Übersichtsseite für GitHub-Repositories mit Suche, Filter und Sortierung." />
+<title>Verteilseite · HTML-Dateien im Repo</title>
+<meta name="description" content="Startseite, die alle HTML-Dateien im Repo-Root auflistet und verlinkt." />
 <style>
   :root{
     --bg:#0b1020; --panel:#101936; --text:#e9edff; --muted:#aab2d5;
     --line:#1d2748; --accent:#5aa2ff; --card:#0f1834; --ok:#46c28b;
   }
-  *{box-sizing:border-box} html,body{height:100%}
+  *{box-sizing:border-box}
   body{margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:var(--bg); color:var(--text)}
   header{padding:28px 20px; border-bottom:1px solid var(--line); background:linear-gradient(180deg, rgba(90,162,255,.12), transparent 30%)}
   .wrap{max-width:1100px; margin:0 auto; padding:0 20px}
-  h1{margin:0 6px 6px 0; font-size:clamp(22px,3.5vw,34px)}
+  h1{margin:0 0 6px; font-size:clamp(22px,3.5vw,34px)}
   .meta{color:var(--muted); font-size:14px}
   .toolbar{display:grid; grid-template-columns:1fr auto auto; gap:10px; margin-top:16px}
   .toolbar input,.toolbar select{
     background:var(--panel); color:var(--text); border:1px solid var(--line);
     padding:10px 12px; border-radius:10px; font-size:14px
   }
+
   .section{padding:22px 0}
   h2{font-size:18px; margin:0 0 10px; color:#dfe6ff}
   .grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
   .card{
     background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px;
-    box-shadow:0 6px 22px rgba(0,0,0,.25); display:flex; flex-direction:column; min-height:160px
+    box-shadow:0 6px 22px rgba(0,0,0,.25); display:flex; flex-direction:column; min-height:120px
   }
   .card h3{margin:0 0 8px; font-size:16px}
   .card p{margin:0 0 10px; color:var(--muted); font-size:14px}
-  .tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:auto}
-  .tag{font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:3px 8px}
-  .row{display:flex; gap:10px; align-items:center; color:var(--muted); font-size:13px; margin:8px 0 0}
-  .row b{color:#cbd6ff; font-weight:600}
-  .links{display:flex; gap:10px; margin-top:10px}
+  .links{display:flex; gap:10px; margin-top:auto}
   .btn{display:inline-block; padding:8px 10px; border-radius:10px; text-decoration:none; color:var(--text); border:1px solid var(--line); background:transparent}
   .btn:hover{border-color:var(--accent)}
-  .empty{color:var(--muted); border:1px dashed var(--line); padding:16px; border-radius:12px}
-  footer{color:var(--muted); font-size:12px; padding:24px 20px; border-top:1px solid var(--line)}
   .pill{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); font-size:12px; color:var(--muted)}
   .pill.ok{color:var(--ok); border-color:#2f6a54}
+  .empty{color:var(--muted); border:1px dashed var(--line); padding:16px; border-radius:12px}
+  footer{color:var(--muted); font-size:12px; padding:24px 20px; border-top:1px solid var(--line)}
   @media (max-width:720px){ .toolbar{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <h1>Projekt-Index</h1>
+    <h1>Verteilseite</h1>
     <div class="meta" id="meta">lädt…</div>
     <div class="toolbar">
-      <input id="q" type="search" placeholder="Suche in Namen & Beschreibung … (z. B. „quali“)" />
+      <input id="q" type="search" placeholder="Suche nach Dateinamen … (z. B. „quali“)" />
       <select id="sort">
-        <option value="updated">Sortierung: Zuletzt aktualisiert</option>
-        <option value="pushed">Sortierung: Zuletzt gepusht</option>
-        <option value="created">Sortierung: Neuste zuerst</option>
         <option value="name">Sortierung: Name A–Z</option>
-        <option value="stars">Sortierung: Sterne ↓</option>
+        <option value="nameDesc">Sortierung: Name Z–A</option>
       </select>
-      <select id="visibility">
-        <option value="all">Alle Repos</option>
-        <option value="public">Nur Public</option>
-        <option value="private">Nur Private*</option>
+      <select id="filter">
+        <option value="all">Alle Dateien</option>
+        <option value="featured">Nur „quali*“</option>
+        <option value="nonfeatured">Ohne „quali*“</option>
       </select>
     </div>
   </div>
@@ -70,38 +64,36 @@
 <main class="wrap">
   <section class="section" id="featuredSec" style="display:none">
     <h2>Empfohlen (<span id="featuredCount">0</span>)</h2>
-    <div class="grid" id="featured"></div>
+    <div class="grid" id="featuredList"></div>
   </section>
 
   <section class="section">
-    <h2>Alle Repositories (<span id="count">0</span>)</h2>
-    <div class="grid" id="list"></div>
-    <div id="empty" class="empty" style="display:none">Keine Repositories gefunden. Passe Suche/Filter an.</div>
+    <h2>Alle HTMLs im Repo-Root (<span id="count">0</span>)</h2>
+    <div class="grid" id="fileList"></div>
+    <div id="empty" class="empty" style="display:none">Keine Dateien gefunden. Prüfe Branch/Ref oder Dateinamen.</div>
   </section>
 </main>
 
 <footer class="wrap">
-  <span>Generiert client-seitig via GitHub API · Kein Build nötig · <span id="updated"></span></span>
+  <span>Generated client-side via GitHub API · <span id="updated"></span></span>
 </footer>
 
 <script>
-/** ======== KONFIGURATION ======== */
+/** ========= KONFIG ========= */
 const CONFIG = {
-  // 👇 HIER EINTRAGEN: GitHub User ODER Organisation
-  owner: "YOUR_GITHUB_OWNER",    // z.B. "TMGSachsen" oder "deinUser"
-  // Repos mit diesem Präfix werden im „Empfohlen“-Block hervorgehoben
-  featuredPrefix: "quali",        // z.B. "quali", "satourn", "" zum Deaktivieren
-  // Optional: nur Repos anzeigen, die mit diesen Präfixen anfangen (leer = alle)
-  allowedPrefixes: [],            // z.B. ["quali", "satourn"]
-  // Optional: Themen/Topics anzeigen? (benötigt public Topics)
-  showTopics: true
+  // Präfix für „Empfohlen“ (leer lassen, um zu deaktivieren)
+  featuredPrefix: 'quali',
+  // Falls Auto-Erkennung von Owner/Repo scheitert, hier fallback setzen (oder via URL-Params owner/repo/ref übergeben)
+  fallbackOwner: '',
+  fallbackRepo: '',
+  fallbackRef: '' // z.B. 'gh-pages' oder 'main'
 };
-/** ================================= */
+/** ========================== */
 
 const els = {
   meta: document.getElementById('meta'),
-  list: document.getElementById('list'),
-  featured: document.getElementById('featured'),
+  fileList: document.getElementById('fileList'),
+  featuredList: document.getElementById('featuredList'),
   featuredSec: document.getElementById('featuredSec'),
   count: document.getElementById('count'),
   featuredCount: document.getElementById('featuredCount'),
@@ -109,164 +101,142 @@ const els = {
   updated: document.getElementById('updated'),
   q: document.getElementById('q'),
   sort: document.getElementById('sort'),
-  visibility: document.getElementById('visibility')
+  filter: document.getElementById('filter')
 };
 
 const state = {
-  all: [],
-  filtered: [],
-  featured: []
+  files: [],
+  featured: [],
+  rest: []
 };
 
-function fmtDate(s){ try{ return new Date(s).toLocaleString('de-DE'); }catch{ return s; } }
 function esc(s=''){ return String(s).replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])); }
-function matchesPrefixes(name, prefixes){
-  if (!prefixes || !prefixes.length) return true;
-  return prefixes.some(p => name.toLowerCase().startsWith(p.toLowerCase()));
-}
-function isFeatured(name, prefix){
-  if (!prefix) return false;
-  return name.toLowerCase().startsWith(prefix.toLowerCase());
+function isHtmlName(name){ return /\.html?$/i.test(name); }
+function isIndex(name){ return /^index\.html?$/i.test(name); }
+function isFeatured(name){ return CONFIG.featuredPrefix && name.toLowerCase().startsWith(CONFIG.featuredPrefix.toLowerCase()); }
+
+function detectOwnerRepoRef(){
+  const u = new URL(location.href);
+  const qpOwner = u.searchParams.get('owner');
+  const qpRepo = u.searchParams.get('repo');
+  const qpRef = u.searchParams.get('ref');
+
+  let owner = qpOwner || '';
+  let repo = qpRepo || '';
+  let ref = qpRef || '';
+
+  // Auto-Erkennung für GitHub Project Pages: owner.github.io/repo/...
+  if (!owner || !repo){
+    const host = location.hostname; // z.B. tmgsachsen.github.io
+    const parts = location.pathname.split('/').filter(Boolean); // ["repo", ...]
+    if (host.endsWith('.github.io') && parts.length){
+      owner = owner || host.split('.')[0];
+      repo = repo || parts[0];
+    }
+  }
+  // Fallbacks
+  owner = owner || CONFIG.fallbackOwner;
+  repo  = repo  || CONFIG.fallbackRepo;
+  ref   = ref   || CONFIG.fallbackRef;
+
+  return {owner, repo, ref};
 }
 
-function card(repo){
-  const name = repo.name;
-  const desc = repo.description || '';
-  const topics = Array.isArray(repo.topics) ? repo.topics.slice(0,6) : [];
+function card(file){
+  const name = file.name;
+  const url = file.browser_url; // relative Link zur Seite
   return `
-  <article class="card">
-    <h3>${esc(name)}</h3>
-    <p>${esc(desc)}</p>
-    <div class="row">
-      <span class="pill">★ ${repo.stargazers_count}</span>
-      <span class="pill">Forks ${repo.forks_count}</span>
-      <span class="pill">Sprache ${esc(repo.language || '—')}</span>
-    </div>
-    <div class="row">Zuletzt aktualisiert: <b>${fmtDate(repo.updated_at)}</b></div>
-    <div class="links">
-      <a class="btn" href="${repo.html_url}" target="_blank" rel="noopener">Repo öffnen</a>
-      ${repo.homepage ? `<a class="btn" href="${repo.homepage}" target="_blank" rel="noopener">Demo/Seite</a>` : ''}
-      <a class="btn" href="${repo.html_url}/releases" target="_blank" rel="noopener">Releases</a>
-    </div>
-    ${CONFIG.showTopics && topics.length ? `<div class="tags">${topics.map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div>`:''}
-  </article>`;
-}
-
-function applyFilters(){
-  const q = els.q.value.trim().toLowerCase();
-  const vis = els.visibility.value; // "all"|"public"|"private"
-  let arr = state.all.slice();
-
-  if (vis !== 'all') {
-    arr = arr.filter(r => (vis === 'public') ? !r.private : r.private);
-  }
-  if (CONFIG.allowedPrefixes && CONFIG.allowedPrefixes.length) {
-    arr = arr.filter(r => matchesPrefixes(r.name, CONFIG.allowedPrefixes));
-  }
-  if (q) {
-    arr = arr.filter(r =>
-      (r.name && r.name.toLowerCase().includes(q)) ||
-      (r.description && r.description.toLowerCase().includes(q))
-    );
-  }
-
-  // Sort
-  const s = els.sort.value;
-  arr.sort((a,b)=>{
-    if (s === 'name') return a.name.localeCompare(b.name, 'de');
-    if (s === 'stars') return (b.stargazers_count|0) - (a.stargazers_count|0);
-    if (s === 'pushed') return new Date(b.pushed_at) - new Date(a.pushed_at);
-    if (s === 'created') return new Date(b.created_at) - new Date(a.created_at);
-    // default: updated
-    return new Date(b.updated_at) - new Date(a.updated_at);
-  });
-
-  // Featured
-  const feat = CONFIG.featuredPrefix ? arr.filter(r => isFeatured(r.name, CONFIG.featuredPrefix)) : [];
-  const rest = CONFIG.featuredPrefix ? arr.filter(r => !isFeatured(r.name, CONFIG.featuredPrefix)) : arr;
-
-  state.filtered = rest;
-  state.featured = feat;
-
-  render();
+    <article class="card">
+      <h3>${esc(name)}</h3>
+      <p class="muted">${esc(file.description || '')}</p>
+      <div class="links">
+        <a class="btn" href="${url}" target="_self" rel="noopener">Öffnen</a>
+        <a class="btn" href="${file.html_url}" target="_blank" rel="noopener">Quelle (Repo)</a>
+      </div>
+    </article>
+  `;
 }
 
 function render(){
-  els.count.textContent = state.filtered.length;
-  els.featuredCount.textContent = state.featured.length;
-  els.featuredSec.style.display = state.featured.length ? '' : 'none';
+  const q = els.q.value.trim().toLowerCase();
+  const sort = els.sort.value;
+  const filter = els.filter.value;
 
-  els.featured.innerHTML = state.featured.map(card).join('');
-  els.list.innerHTML = state.filtered.map(card).join('');
-  els.empty.style.display = (state.filtered.length + state.featured.length) ? 'none' : '';
+  let arr = state.files.slice();
+
+  if (filter === 'featured') arr = arr.filter(f => f._featured);
+  if (filter === 'nonfeatured') arr = arr.filter(f => !f._featured);
+
+  if (q) {
+    arr = arr.filter(f => f.name.toLowerCase().includes(q));
+  }
+
+  // Sortierung
+  arr.sort((a,b)=>{
+    if (sort === 'nameDesc') return b.name.localeCompare(a.name, 'de');
+    return a.name.localeCompare(b.name, 'de');
+  });
+
+  // Featured-Block
+  const feat = arr.filter(f => f._featured);
+  const rest = arr.filter(f => !f._featured);
+
+  els.featuredCount.textContent = feat.length;
+  els.featuredSec.style.display = feat.length ? '' : 'none';
+  els.featuredList.innerHTML = feat.map(card).join('');
+
+  els.count.textContent = arr.length;
+  els.fileList.innerHTML = rest.map(card).join('');
+  els.empty.style.display = arr.length ? 'none' : '';
 }
 
-async function fetchAllRepos(owner){
-  // List repos for user/org – wir probieren beide Endpunkte.
-  const headers = {'Accept': 'application/vnd.github+json'};
-  const perPage = 100;
-  let repos = [];
+async function fetchRootHtmlFiles(owner, repo, ref){
+  const headers = { 'Accept': 'application/vnd.github+json' };
+  const url = new URL(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/`);
+  if (ref) url.searchParams.set('ref', ref);
 
-  // helper: paginierte Abfrage
-  async function fetchPaged(url){
-    let page = 1, out = [];
-    while (true){
-      const res = await fetch(`${url}?per_page=${perPage}&page=${page}`, {headers});
-      if (res.status === 404) return []; // falscher Typ (user vs org)
-      if (!res.ok) throw new Error('GitHub API Fehler: '+res.status);
-      const data = await res.json();
-      out = out.concat(data);
-      if (data.length < perPage) break;
-      page++;
-    }
-    return out;
-  }
-
-  // Versuche Organisation
-  repos = await fetchPaged(`https://api.github.com/orgs/${encodeURIComponent(owner)}/repos`);
-  if (!repos.length){
-    // Versuche Nutzer
-    repos = await fetchPaged(`https://api.github.com/users/${encodeURIComponent(owner)}/repos`);
-  }
-
-  // Topics extra (benötigt pro Repo call)
-  if (CONFIG.showTopics && repos.length){
-    await Promise.all(repos.map(async r=>{
-      try{
-        const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(r.owner.login)}/${encodeURIComponent(r.name)}/topics`, {
-          headers: {'Accept':'application/vnd.github.mercy-preview+json'}
-        });
-        if (res.ok){ const t = await res.json(); r.topics = t.names || []; }
-      }catch(e){}
+  const res = await fetch(url.toString(), {headers});
+  if (!res.ok) throw new Error(`GitHub API Fehler ${res.status}`);
+  const data = await res.json();
+  // Nur Dateien im Root, die .html sind (ohne index.html)
+  const files = (Array.isArray(data) ? data : [])
+    .filter(e => e.type === 'file' && isHtmlName(e.name) && !isIndex(e.name))
+    .map(e => ({
+      name: e.name,
+      path: e.path,
+      size: e.size,
+      sha: e.sha,
+      html_url: `https://github.com/${owner}/${repo}/blob/${ref || 'HEAD'}/${encodeURIComponent(e.path)}`,
+      // Browser-URL relativ (funktioniert auch mit Custom Domains):
+      browser_url: `./${encodeURIComponent(e.name)}`,
+      _featured: isFeatured(e.name)
     }));
-  }
-  return repos;
-}
-
-function readOwnerFromURL(){
-  const u = new URL(location.href);
-  const ownerQ = u.searchParams.get('owner');
-  return ownerQ || CONFIG.owner;
+  return files;
 }
 
 (async function init(){
-  const owner = readOwnerFromURL();
-  els.meta.textContent = `Quelle: github.com/${owner} · (anonymes API-Limit: ~60 Requests/Stunde)`;
   els.updated.textContent = new Date().toLocaleString('de-DE');
+  const {owner, repo, ref} = detectOwnerRepoRef();
+
+  if (!owner || !repo){
+    els.meta.innerHTML = `⚠️ Owner/Repo nicht erkannt. Übergib sie per URL, z. B. <code>?owner=TMGSachsen&repo=mein-repo&ref=gh-pages</code> oder trage Fallbacks im Skript ein.`;
+    return;
+  }
+
+  els.meta.textContent = `Quelle: ${owner}/${repo}${ref ? ' @ '+ref : ''} · zeigt *.html im Repo-Root`;
 
   try{
-    const repos = await fetchAllRepos(owner);
-    state.all = repos;
-    applyFilters();
+    const files = await fetchRootHtmlFiles(owner, repo, ref);
+    state.files = files;
+    render();
   }catch(e){
-    els.list.innerHTML = `<div class="empty">Fehler beim Laden der Repos: ${esc(e.message)}<br>
-    Prüfe den Owner-Namen oder versuche es später erneut.</div>`;
+    els.fileList.innerHTML = `<div class="empty">Fehler beim Laden: ${esc(e.message)}. Prüfe Branch/Ref oder Repo-Berechtigungen.</div>`;
   }
 
   ['input','change'].forEach(ev=>{
-    els.q.addEventListener(ev, applyFilters);
-    els.sort.addEventListener(ev, applyFilters);
-    els.visibility.addEventListener(ev, applyFilters);
+    els.q.addEventListener(ev, render);
+    els.sort.addEventListener(ev, render);
+    els.filter.addEventListener(ev, render);
   });
 })();
 </script>
