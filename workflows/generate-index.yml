@@ -1,0 +1,49 @@
+name: Generate index.html
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "*.html"
+      - ".github/workflows/generate-index.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # erlaubt das Committen
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Regenerate index.html from embedded generator
+        run: |
+          node -e '
+          const fs = require("fs");
+          const vm = require("vm");
+          let html = fs.readFileSync("index.html","utf8");
+          const m = html.match(/<script id="generator"[^>]*>([\\s\\S]*?)<\\/script>/);
+          if (!m) throw new Error("Generator-Script nicht gefunden");
+          const ctx = { require, process, console };
+          vm.createContext(ctx);
+          vm.runInContext(m[1], ctx);
+          if (typeof ctx.generateIndex !== "function") throw new Error("generateIndex() fehlt");
+          const out = ctx.generateIndex(html);
+          fs.writeFileSync("index.html", out, "utf8");
+          console.log("index.html neu erzeugt");
+          '
+
+      - name: Commit changes (if any)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-generate index.html"
+          branch: main
+          file_pattern: index.html
