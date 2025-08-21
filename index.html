@@ -1,256 +1,75 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Verteilseite · HTML-Dateien im Repo</title>
-<meta name="description" content="Startseite, die alle HTML-Dateien im Repo-Root auflistet und verlinkt." />
 <style>
-  :root{
-    --bg:#0b1020; --panel:#101936; --text:#e9edff; --muted:#aab2d5;
-    --line:#1d2748; --accent:#5aa2ff; --card:#0f1834; --ok:#46c28b;
+  body {
+    font-family: system-ui, sans-serif;
+    background: #0b1020;
+    color: #e9edff;
+    margin: 0;
+    padding: 2rem;
   }
-  *{box-sizing:border-box}
-  body{margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:var(--bg); color:var(--text)}
-  header{padding:28px 20px; border-bottom:1px solid var(--line); background:linear-gradient(180deg, rgba(90,162,255,.12), transparent 30%)}
-  .wrap{max-width:1100px; margin:0 auto; padding:0 20px}
-  h1{margin:0 0 6px; font-size:clamp(22px,3.5vw,34px)}
-  .meta{color:var(--muted); font-size:14px}
-  .toolbar{display:grid; grid-template-columns:1fr auto auto; gap:10px; margin-top:16px}
-  .toolbar input,.toolbar select{
-    background:var(--panel); color:var(--text); border:1px solid var(--line);
-    padding:10px 12px; border-radius:10px; font-size:14px
+  h1 { margin-top: 0; }
+  ul { list-style: none; padding: 0; }
+  li {
+    background: #101936;
+    border: 1px solid #1d2748;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
   }
-
-  .section{padding:22px 0}
-  h2{font-size:18px; margin:0 0 10px; color:#dfe6ff}
-  .grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
-  .card{
-    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px;
-    box-shadow:0 6px 22px rgba(0,0,0,.25); display:flex; flex-direction:column; min-height:120px
+  a {
+    color: #5aa2ff;
+    text-decoration: none;
   }
-  .card h3{margin:0 0 8px; font-size:16px}
-  .card p{margin:0 0 10px; color:var(--muted); font-size:14px}
-  .links{display:flex; gap:10px; margin-top:auto}
-  .btn{display:inline-block; padding:8px 10px; border-radius:10px; text-decoration:none; color:var(--text); border:1px solid var(--line); background:transparent}
-  .btn:hover{border-color:var(--accent)}
-  .pill{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); font-size:12px; color:var(--muted)}
-  .pill.ok{color:var(--ok); border-color:#2f6a54}
-  .empty{color:var(--muted); border:1px dashed var(--line); padding:16px; border-radius:12px}
-  footer{color:var(--muted); font-size:12px; padding:24px 20px; border-top:1px solid var(--line)}
-  @media (max-width:720px){ .toolbar{grid-template-columns:1fr;}}
+  a:hover { text-decoration: underline; }
+  .meta { color:#aab2d5; font-size: 0.9rem; margin-bottom: 1rem; }
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <h1>Verteilseite</h1>
-    <div class="meta" id="meta">lädt…</div>
-    <div class="toolbar">
-      <input id="q" type="search" placeholder="Suche nach Dateinamen … (z. B. „quali“)" />
-      <select id="sort">
-        <option value="name">Sortierung: Name A–Z</option>
-        <option value="nameDesc">Sortierung: Name Z–A</option>
-      </select>
-      <select id="filter">
-        <option value="all">Alle Dateien</option>
-        <option value="featured">Nur „quali*“</option>
-        <option value="nonfeatured">Ohne „quali*“</option>
-      </select>
-    </div>
-  </div>
-</header>
-
-<main class="wrap">
-  <section class="section" id="featuredSec" style="display:none">
-    <h2>Empfohlen (<span id="featuredCount">0</span>)</h2>
-    <div class="grid" id="featuredList"></div>
-  </section>
-
-  <section class="section">
-    <h2>Alle HTMLs im Repo-Root (<span id="count">0</span>)</h2>
-    <div class="grid" id="fileList"></div>
-    <div id="empty" class="empty" style="display:none">Keine Dateien gefunden. Prüfe Branch/Ref oder Dateinamen.</div>
-  </section>
-</main>
-
-<footer class="wrap">
-  <span>Generated client-side via GitHub API · <span id="updated"></span></span>
-</footer>
+  <h1>Verteilseite</h1>
+  <div class="meta" id="meta">lädt…</div>
+  <ul id="list"></ul>
 
 <script>
-const CONFIG = {
-  featuredPrefix: 'quali',
-  fallbackOwner: '',  // optional eintragen
-  fallbackRepo: '',   // optional eintragen
-  fallbackRef: ''     // optional: z. B. 'gh-pages'
-};
+const OWNER = "tim-meyer-tmgs";   // <- dein GitHub-Nutzer
+const REPO  = "Test";             // <- Repo-Name
+const REF   = "main";             // <- Branch
 
-const els = {
-  meta: document.getElementById('meta'),
-  fileList: document.getElementById('fileList'),
-  featuredList: document.getElementById('featuredList'),
-  featuredSec: document.getElementById('featuredSec'),
-  count: document.getElementById('count'),
-  featuredCount: document.getElementById('featuredCount'),
-  empty: document.getElementById('empty'),
-  updated: document.getElementById('updated'),
-  q: document.getElementById('q'),
-  sort: document.getElementById('sort'),
-  filter: document.getElementById('filter')
-};
+const listEl = document.getElementById("list");
+const metaEl = document.getElementById("meta");
 
-const state = { files: [] };
+function esc(s){ return String(s).replace(/[&<>]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])); }
 
-function esc(s=''){ return String(s).replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])); }
-const isHtml = n => /\.html?$/i.test(n);
-const isIndex = n => /^index\.html?$/i.test(n);
-const isFeatured = (n,p='quali') => p && n.toLowerCase().startsWith(p.toLowerCase());
+async function init(){
+  metaEl.textContent = `Quelle: ${OWNER}/${REPO} @ ${REF} · zeigt *.html im Repo-Root`;
 
-function detectOwnerRepoRef(){
-  const u = new URL(location.href);
-  let owner = u.searchParams.get('owner') || '';
-  let repo  = u.searchParams.get('repo')  || '';
-  let ref   = u.searchParams.get('ref')   || '';
-  if ((!owner || !repo) && location.hostname.endsWith('.github.io')) {
-    owner = owner || location.hostname.split('.')[0];
-    const parts = location.pathname.split('/').filter(Boolean);
-    repo = repo || (parts[0] || '');
-  }
-  owner ||= CONFIG.fallbackOwner;
-  repo  ||= CONFIG.fallbackRepo;
-  ref   ||= CONFIG.fallbackRef;
-  return { owner, repo, ref };
-}
-
-function card(file){
-  return `
-    <article class="card">
-      <h3>${esc(file.name)}</h3>
-      <div class="links">
-        <a class="btn" href="${file.browser_url}" target="_self" rel="noopener">Öffnen</a>
-        <a class="btn" href="${file.html_url}" target="_blank" rel="noopener">Quelle</a>
-      </div>
-    </article>`;
-}
-
-function render(){
-  const q = els.q.value.trim().toLowerCase();
-  const filter = els.filter.value;
-  const sort = els.sort.value;
-
-  let arr = state.files.slice();
-  if (filter === 'featured') arr = arr.filter(f => f._featured);
-  if (filter === 'nonfeatured') arr = arr.filter(f => !f._featured);
-  if (q) arr = arr.filter(f => f.name.toLowerCase().includes(q));
-  arr.sort((a,b)=> sort === 'nameDesc' ? b.name.localeCompare(a.name,'de') : a.name.localeCompare(b.name,'de'));
-
-  const feat = arr.filter(f => f._featured);
-  const rest = arr.filter(f => !f._featured);
-
-  els.featuredCount.textContent = feat.length;
-  els.featuredSec.style.display = feat.length ? '' : 'none';
-  els.featuredList.innerHTML = feat.map(card).join('');
-  els.count.textContent = arr.length;
-  els.fileList.innerHTML = rest.map(card).join('');
-  els.empty.style.display = arr.length ? 'none' : '';
-}
-
-async function fetchJSON(url, headers){
-  const res = await fetch(url, { headers });
-  if (res.status === 404) throw new Error('404_NOT_FOUND');
-  if (res.status === 403) throw new Error('403_FORBIDDEN'); // rate limit oder privat
-  if (!res.ok) throw new Error(String(res.status));
-  return res.json();
-}
-
-async function getDefaultBranch(owner, repo){
-  const headers = {'Accept':'application/vnd.github+json'};
-  const data = await fetchJSON(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, headers);
-  return data.default_branch || 'main';
-}
-
-async function listRootHtml(owner, repo, ref){
-  const headers = {'Accept':'application/vnd.github+json'};
-  const url = new URL(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/`);
-  if (ref) url.searchParams.set('ref', ref);
-  const data = await fetchJSON(url.toString(), headers);
-  return (Array.isArray(data)?data:[])
-    .filter(e => e.type === 'file' && isHtml(e.name) && !isIndex(e.name))
-    .map(e => ({
-      name: e.name,
-      path: e.path,
-      html_url: `https://github.com/${owner}/${repo}/blob/${ref || 'HEAD'}/${encodeURIComponent(e.path)}`,
-      browser_url: `./${encodeURIComponent(e.name)}`,
-      _featured: isFeatured(e.name, CONFIG.featuredPrefix)
-    }));
-}
-
-(async function init(){
-  els.updated.textContent = new Date().toLocaleString('de-DE');
-  const {owner, repo, ref: refParam} = detectOwnerRepoRef();
-
-  if (!owner || !repo){
-    els.meta.innerHTML = `⚠️ Owner/Repo nicht erkannt. Übergib per URL: <code>?owner=DEINUSER&repo=DEINREPO&ref=BRANCH</code>`;
-    return;
-  }
-
-  // 1) Ermittel default_branch, falls kein ref übergeben
-  let refsToTry = [];
   try {
-    const defaultRef = refParam || await getDefaultBranch(owner, repo);
-    refsToTry = [defaultRef];
-  } catch (e) {
-    if (e.message === '404_NOT_FOUND') {
-      els.fileList.innerHTML = `<div class="empty">Repo <b>${esc(owner)}/${esc(repo)}</b> nicht gefunden (oder privat).</div>`;
+    const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/?ref=${REF}`;
+    const res = await fetch(url,{headers:{'Accept':'application/vnd.github+json'}});
+    if(!res.ok) throw new Error("Fehler " + res.status);
+    const data = await res.json();
+
+    const files = data
+      .filter(e => e.type==="file" && /\.html?$/i.test(e.name) && !/^index\.html?$/i.test(e.name));
+
+    if(!files.length){
+      listEl.innerHTML = `<li>Keine .html-Dateien im Repo-Root gefunden.</li>`;
       return;
     }
-    if (e.message === '403_FORBIDDEN') {
-      els.fileList.innerHTML = `<div class="empty">Zugriff verweigert / Rate-Limit. Ist das Repo privat? Öffentliche Repos sind nötig.</div>`;
-      return;
-    }
-    els.fileList.innerHTML = `<div class="empty">Fehler: ${esc(e.message)}</div>`;
-    return;
+
+    listEl.innerHTML = files.map(f=>{
+      return `<li><a href="./${encodeURIComponent(f.name)}">${esc(f.name)}</a></li>`;
+    }).join("");
+  } catch(e){
+    listEl.innerHTML = `<li>Fehler: ${esc(e.message)}</li>`;
   }
+}
 
-  // 2) Zusätzlich gh-pages testen, falls nicht identisch
-  if (!refParam && !refsToTry.includes('gh-pages')) refsToTry.push('gh-pages');
-
-  els.meta.textContent = `Quelle: ${owner}/${repo} · prüfe Branch: ${refsToTry.join(', ')}`;
-
-  // 3) Refs der Reihe nach probieren, erster Treffer gewinnt
-  let files = [];
-  for (const r of refsToTry) {
-    try {
-      const f = await listRootHtml(owner, repo, r);
-      if (f.length) { files = f; break; }
-      // wenn leer, trotzdem weiterprobieren
-    } catch (e) {
-      if (e.message === '403_FORBIDDEN') {
-        els.fileList.innerHTML = `<div class="empty">Repo ist privat oder Rate-Limit erreicht. Öffentlich schalten oder mit Token laden.</div>`;
-        return;
-      }
-      // bei 404 weiter mit nächstem ref
-    }
-  }
-
-  if (!files.length){
-    els.fileList.innerHTML = `<div class="empty">Keine *.html im Repo-Root gefunden (ausgenommen index.html). Leigen die Dateien evtl. in Unterordnern oder auf einem anderen Branch?</div>`;
-    els.count.textContent = '0';
-    els.featuredSec.style.display = 'none';
-    return;
-  }
-
-  state.files = files;
-  render();
-
-  ['input','change'].forEach(ev=>{
-    els.q.addEventListener(ev, render);
-    els.sort.addEventListener(ev, render);
-    els.filter.addEventListener(ev, render);
-  });
-})();
+init();
 </script>
-
 </body>
 </html>
