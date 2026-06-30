@@ -77,8 +77,6 @@
   </main>
   <script>
     (function () {
-      var firstPathSegment = window.location.pathname.split("/").filter(Boolean)[0] || "";
-      var basePath = firstPathSegment ? "/" + firstPathSegment : "";
       var script = document.createElement("script");
 
       window.__D1_LOADED = true;
@@ -88,7 +86,7 @@
       script.dataset.experience = "open-data-sachsen-tourismus";
       script.dataset.template = "wlan";
       script.dataset.routerMode = "history";
-      script.dataset.basePath = basePath;
+      script.dataset.basePath = "/Test";
       document.body.appendChild(script);
     })();
   </script>
