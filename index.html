@@ -4,15 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>destination.one Widget Test</title>
-  <script
-    type="module"
-    src="https://newpages.destination.one/web-components.js"
-    data-language="de"
-    data-experience="open-data-sachsen-tourismus"
-    data-template="wlan"
-    data-router-mode="history"
-    data-base-path="/Test/"
-  ></script>
   <style>
     :root {
       color-scheme: light;
@@ -84,5 +75,22 @@
       ></done-result-list>
     </section>
   </main>
+  <script>
+    (function () {
+      var firstPathSegment = window.location.pathname.split("/").filter(Boolean)[0] || "";
+      var basePath = firstPathSegment ? "/" + firstPathSegment : "";
+      var script = document.createElement("script");
+
+      window.__D1_LOADED = true;
+      script.type = "module";
+      script.src = "https://newpages.destination.one/web-components.js";
+      script.dataset.language = "de";
+      script.dataset.experience = "open-data-sachsen-tourismus";
+      script.dataset.template = "wlan";
+      script.dataset.routerMode = "history";
+      script.dataset.basePath = basePath;
+      document.body.appendChild(script);
+    })();
+  </script>
 </body>
 </html>
