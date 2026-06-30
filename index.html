@@ -75,20 +75,14 @@
       ></done-result-list>
     </section>
   </main>
-  <script>
-    (function () {
-      var script = document.createElement("script");
-
-      window.__D1_LOADED = true;
-      script.type = "module";
-      script.src = "https://newpages.destination.one/web-components.js";
-      script.dataset.language = "de";
-      script.dataset.experience = "open-data-sachsen-tourismus";
-      script.dataset.template = "wlan";
-      script.dataset.routerMode = "history";
-      script.dataset.basePath = "/Test";
-      document.body.appendChild(script);
-    })();
-  </script>
+  <script
+    type="module"
+    src="https://newpages.destination.one/web-components.js"
+    data-language="de"
+    data-experience="open-data-sachsen-tourismus"
+    data-template="wlan"
+    data-router-mode="history"
+    data-base-path="/Test"
+  ></script>
 </body>
 </html>
