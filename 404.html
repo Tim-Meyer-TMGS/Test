@@ -56,6 +56,18 @@
     done-result-list {
       display: block;
       min-height: 520px;
+      --color-scheme-base-background-color: #ffffff;
+      --color-scheme-base-color: #000000;
+      --color-scheme-base-link-color: #000000;
+      --color-scheme-base-link-color-hover: #f70099;
+      --color-scheme-container-background-color: #e6e6e6;
+      --color-scheme-container-color: #333333;
+      --color-scheme-container-link-color: #000000;
+      --color-scheme-container-link-color-hover: #f70099;
+      --color-scheme-conversion-background-color: #ffffff;
+      --color-scheme-conversion-color: #333333;
+      --color-scheme-conversion-link-color: #000000;
+      --color-scheme-conversion-link-color-hover: #000000;
     }
   </style>
 </head>
@@ -70,8 +82,10 @@
       <done-result-list
         layout="card"
         map="half"
-        limit="12"
-        custom-query="type:Event/area:&quot;Chemnitz.Zwickau.Region.&quot;"
+        hide-overall-count
+        limit="16"
+        type="Event"
+        sort="intervalFirstMatchSlow"
       ></done-result-list>
     </section>
   </main>
@@ -79,7 +93,7 @@
     type="module"
     src="https://newpages.destination.one/web-components.js"
     data-language="de"
-    data-experience="open-data-sachsen-tourismus"
+    data-experience="chemnitz-zwickau-region"
     data-template="wlan"
     data-router-mode="history"
     data-base-path="/veranstaltungen"
