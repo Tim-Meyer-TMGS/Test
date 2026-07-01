@@ -72,27 +72,21 @@
   </style>
 </head>
 <body>
-  <main>
-    <section class="widget-shell" aria-label="destination.one Widget">
-      <done-result-list
-        layout="card"
-        map="half"
-        hide-overall-count
-        limit="16"
-        type="Event"
-        sort="intervalFirstMatchSlow"
-      ></done-result-list>
-    </section>
-  </main>
-
   <script
-    type="module"
-    src="https://newpages.destination.one/web-components.js"
-    data-language="de"
-    data-experience="chemnitz-zwickau-region"
-    data-template="wlan"
-    data-router-mode="history"
-    data-base-path="/Test"
-  ></script>
+  type="module"
+  src="https://newpages.destination.one/web-components.js"
+  data-language="de"
+  data-experience="open-data-sachsen-tourismus"
+  data-template="wlan"
+  data-router-mode="memory"
+></script>
+
+<done-result-list
+  layout="card"
+  map="hide"
+  limit="12"
+  type="Event"
+  sort="intervalFirstMatchSlow"
+></done-result-list>
 </body>
 </html>
